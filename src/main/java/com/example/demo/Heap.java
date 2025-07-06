@@ -12,62 +12,35 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class Heap {
-    private class Node {
-        int value;
-        Circle circle;
-        Label label;
-        Line leftEdge;
-        Line rightEdge;
-
-        Node(int value, Circle circle, Label label) {
-            this.value = value;
-            this.circle = circle;
-            this.label = label;
-            this.leftEdge = new Line();
-            this.rightEdge = new Line();
-            this.leftEdge.setVisible(false);
-            this.rightEdge.setVisible(false);
-        }
-    }
-
-    private List<Node> heap;
+    private List<Integer> heap;
+    private List<Circle> circles;
+    private List<Label> labels;
     private Pane canvas;
-    private List<Line> edges;
+    private static final double RADIUS = 20;
+    private static final double PADDING = 50;
+    private static final double LEVEL_HEIGHT = 100;
 
     public Heap(Pane canvas) {
         this.canvas = canvas;
         this.heap = new ArrayList<>();
-        this.edges = new ArrayList<>();
+        this.circles = new ArrayList<>();
+        this.labels = new ArrayList<>();
     }
 
     public void insert(int value) {
-        Circle circle = new Circle(0, 0, 20);
+        heap.add(value);
+        Circle circle = new Circle(0, 0, RADIUS);
         circle.setFill(Color.LIGHTGREEN);
         circle.setStroke(Color.BLACK);
         Label label = new Label(String.valueOf(value));
-        label.setLayoutX(0);
-        label.setLayoutY(0);
-        Node newNode = new Node(value, circle, label);
-        heap.add(newNode);
+        label.setLayoutX(-5);
+        label.setLayoutY(-5);
+        label.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+        circles.add(circle);
+        labels.add(label);
         canvas.getChildren().addAll(circle, label);
-
-        int index = heap.size() - 1;
-        highlightNode(index, Color.YELLOW);
-        heapifyUp(index);
         updatePositions();
-    }
-
-    private void heapifyUp(int index) {
-        while (index > 0) {
-            int parent = (index - 1) / 2;
-            if (heap.get(index).value > heap.get(parent).value) {
-                swap(index, parent);
-                highlightNode(parent, Color.YELLOW);
-                index = parent;
-            } else {
-                break;
-            }
-        }
+        highlightNode(circle, Color.YELLOW);
     }
 
     public void removeMax() {
@@ -75,64 +48,90 @@ public class Heap {
             showWarning("Heap is empty");
             return;
         }
-        Node max = heap.get(0);
-        highlightNode(0, Color.RED);
-        canvas.getChildren().removeAll(max.circle, max.label, max.leftEdge, max.rightEdge);
+        int max = heap.get(0);
         heap.set(0, heap.get(heap.size() - 1));
         heap.remove(heap.size() - 1);
-        if (!heap.isEmpty()) {
-            heapifyDown(0);
-        }
-        updatePositions();
-    }
-
-    private void heapifyDown(int index) {
-        int maxIndex = index;
-        int leftChild = 2 * index + 1;
-        int rightChild = 2 * index + 2;
-
-        if (leftChild < heap.size() && heap.get(leftChild).value > heap.get(maxIndex).value) {
-            maxIndex = leftChild;
-        }
-        if (rightChild < heap.size() && heap.get(rightChild).value > heap.get(maxIndex).value) {
-            maxIndex = rightChild;
-        }
-
-        if (index != maxIndex) {
-            swap(index, maxIndex);
-            highlightNode(maxIndex, Color.YELLOW);
-            heapifyDown(maxIndex);
-        }
-    }
-
-    public void peekMax() {
-        if (heap.isEmpty()) {
-            showWarning("Heap is empty");
-            return;
-        }
-        highlightNode(0, Color.GREEN);
-    }
-
-    public boolean isEmpty() {
-        return heap.isEmpty();
-    }
-
-    public void isEmptyVisual() {
-        String msg = isEmpty() ? "Heap is empty" : "Heap is not empty";
-        showWarning(msg);
-    }
-
-    private void swap(int i, int j) {
-        Node temp = heap.get(i);
-        heap.set(i, heap.get(j));
-        heap.set(j, temp);
-    }
-
-    private void highlightNode(int index, Color color) {
-        Node node = heap.get(index);
-        node.circle.setFill(color);
+        Circle circle = circles.remove(0);
+        Label label = labels.remove(0);
+        highlightNode(circle, Color.RED);
         PauseTransition pt = new PauseTransition(Duration.seconds(0.5));
-        pt.setOnFinished(e -> node.circle.setFill(Color.LIGHTGREEN));
+        pt.setOnFinished(e -> {
+            canvas.getChildren().removeAll(circle, label);
+            updatePositions();
+            drawLines();
+        });
+        pt.play();
+        heapify(0);
+    }
+
+    private void heapify(int index) {
+        int largest = index;
+        int left = 2 * index + 1;
+        int right = 2 * index + 2;
+
+        if (left < heap.size() && heap.get(left) > heap.get(largest)) largest = left;
+        if (right < heap.size() && heap.get(right) > heap.get(largest)) largest = right;
+
+        if (largest != index) {
+            int temp = heap.get(index);
+            heap.set(index, heap.get(largest));
+            heap.set(largest, temp);
+            updatePositions();
+            drawLines();
+            heapify(largest);
+        }
+    }
+
+    private void updatePositions() {
+        canvas.getChildren().removeIf(node -> node instanceof Line);
+        int height = (int) (Math.log(heap.size() + 1) / Math.log(2));
+        double maxWidth = canvas.getWidth() - 2 * PADDING;
+        double nodeSpacing = maxWidth / (int) Math.pow(2, height);
+
+        for (int i = 0; i < heap.size(); i++) {
+            int level = (int) (Math.log(i + 1) / Math.log(2));
+            int levelSize = (int) Math.pow(2, level);
+            int levelPos = i - (int) Math.pow(2, level) + 1;
+            double x = PADDING + (levelPos * 2 + 1) * nodeSpacing / 2;
+            double y = PADDING + level * LEVEL_HEIGHT;
+            Circle circle = circles.get(i);
+            Label label = labels.get(i);
+            circle.setCenterX(x);
+            circle.setCenterY(y);
+            label.setLayoutX(x - 5);
+            label.setLayoutY(y - 5);
+        }
+        drawLines();
+    }
+
+    private void drawLines() {
+        canvas.getChildren().removeIf(node -> node instanceof Line);
+        for (int i = 0; i < heap.size() / 2; i++) {
+            int left = 2 * i + 1;
+            int right = 2 * i + 2;
+            if (left < heap.size()) {
+                Line line = new Line(
+                        circles.get(i).getCenterX(), circles.get(i).getCenterY(),
+                        circles.get(left).getCenterX(), circles.get(left).getCenterY()
+                );
+                line.setStroke(Color.GRAY);
+                canvas.getChildren().add(line);
+            }
+            if (right < heap.size()) {
+                Line line = new Line(
+                        circles.get(i).getCenterX(), circles.get(i).getCenterY(),
+                        circles.get(right).getCenterX(), circles.get(right).getCenterY()
+                );
+                line.setStroke(Color.GRAY);
+                canvas.getChildren().add(line);
+            }
+        }
+    }
+
+    private void highlightNode(Circle circle, Color color) {
+        circle.setFill(color);
+        PauseTransition pt = new PauseTransition(Duration.seconds(0.5));
+        pt.setOnFinished(e -> circle.setFill(Color.LIGHTGREEN));
         pt.play();
     }
 
@@ -147,59 +146,20 @@ public class Heap {
         pt.play();
     }
 
-    private void updatePositions() {
-        canvas.getChildren().removeAll(edges);
-        edges.clear();
-        if (heap.isEmpty()) return;
-
-        double centerX = canvas.getWidth() / 2;
-        double startY = 50;
-        double levelHeight = 80;
-        double baseWidth = 600; // Widened for larger trees (supports height > 4)
-
-        for (int i = 0; i < heap.size(); i++) {
-            int level = (int) Math.floor(Math.log(i + 1) / Math.log(2));
-            int nodesInLevel = (int) Math.pow(2, level);
-            int indexInLevel = i - ((int) Math.pow(2, level) - 1);
-            double x = centerX + (indexInLevel - nodesInLevel / 2.0 + 0.5) * (baseWidth / nodesInLevel);
-            double y = startY + level * levelHeight;
-
-            Node node = heap.get(i);
-            node.circle.setCenterX(x);
-            node.circle.setCenterY(y);
-            node.label.setLayoutX(x - 10);
-            node.label.setLayoutY(y - 10);
-
-            int leftChild = 2 * i + 1;
-            int rightChild = 2 * i + 2;
-
-            if (leftChild < heap.size()) {
-                node.leftEdge.setStartX(x);
-                node.leftEdge.setStartY(y + 20);
-                node.leftEdge.setEndX(heap.get(leftChild).circle.getCenterX());
-                node.leftEdge.setEndY(heap.get(leftChild).circle.getCenterY() - 20);
-                node.leftEdge.setVisible(true);
-                if (!canvas.getChildren().contains(node.leftEdge)) {
-                    canvas.getChildren().add(node.leftEdge);
-                }
-                edges.add(node.leftEdge);
-            } else {
-                node.leftEdge.setVisible(false);
-            }
-
-            if (rightChild < heap.size()) {
-                node.rightEdge.setStartX(x);
-                node.rightEdge.setStartY(y + 20);
-                node.rightEdge.setEndX(heap.get(rightChild).circle.getCenterX());
-                node.rightEdge.setEndY(heap.get(rightChild).circle.getCenterY() - 20);
-                node.rightEdge.setVisible(true);
-                if (!canvas.getChildren().contains(node.rightEdge)) {
-                    canvas.getChildren().add(node.rightEdge);
-                }
-                edges.add(node.rightEdge);
-            } else {
-                node.rightEdge.setVisible(false);
-            }
+    public void peekMax() {
+        if (heap.isEmpty()) {
+            showWarning("Heap is empty");
+            return;
         }
+        //highlightNode(0, Color.GREEN);
+        highlightNode(circles.get(0), Color.GREEN);
     }
+    public boolean isEmpty() {
+        return heap.isEmpty();
+    }
+    public void isEmptyVisual() {
+        String msg = isEmpty() ? "Heap is empty" : "Heap is not empty";
+        showWarning(msg);
+    }
+
 }

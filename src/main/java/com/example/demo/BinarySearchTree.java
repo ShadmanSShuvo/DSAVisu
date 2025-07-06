@@ -175,8 +175,8 @@ public class BinarySearchTree {
         if (root == null) return;
         double centerX = canvas.getWidth() / 2;
         double startY = 50;
-        double levelHeight = 80;
-        double baseWidth = 400; // Widened for larger trees
+        double levelHeight = 100; // Increased for better spacing
+        double baseWidth = 800; // Widened for deeper trees
         assignPositions(root, centerX, startY, baseWidth, 0);
         for (Node node : nodes) {
             if (node.left != null) {
@@ -204,11 +204,11 @@ public class BinarySearchTree {
         if (node == null) return;
         node.circle.setCenterX(x);
         node.circle.setCenterY(y);
-        double levelHeight = 80;
         node.label.setLayoutX(x - 10);
         node.label.setLayoutY(y - 10);
-        double offset = width / Math.pow(2, level + 1);
-        assignPositions(node.left, x - offset, y + levelHeight, width / 2, level + 1);
-        assignPositions(node.right, x + offset, y + levelHeight, width / 2, level + 1);
+        double levelHeight = 100; // Increased for better spacing
+        double offset = width / 2.5; // More aggressive width reduction
+        assignPositions(node.left, x - offset, y + levelHeight, width / 2.5, level + 1);
+        assignPositions(node.right, x + offset, y + levelHeight, width / 2.5, level + 1);
     }
 }

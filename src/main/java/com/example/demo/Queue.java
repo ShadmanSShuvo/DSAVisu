@@ -9,6 +9,7 @@ import javafx.util.Duration;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
 
 public class Queue {
     private List<String> queue;
@@ -24,12 +25,12 @@ public class Queue {
     }
 
     public void enqueue(String value) {
-        Rectangle rect = new Rectangle(0, canvas.getHeight() - 50, 100, 40);
+        Rectangle rect = new Rectangle(0, 0, 100, 40);
         rect.setFill(Color.LIGHTPINK);
         rect.setStroke(Color.BLACK);
         Label label = new Label(value);
         label.setLayoutX(30);
-        label.setLayoutY(canvas.getHeight() - 40);
+        label.setLayoutY(10);
         queue.add(value);
         rectangles.add(rect);
         labels.add(label);
@@ -54,10 +55,28 @@ public class Queue {
         });
         pt.play();
     }
+//    public String front() {
+//        if (queue.isEmpty()) {
+//            throw new NoSuchElementException("Queue is empty");
+//        }
+//        return queue.get(0);
+//    }
+
+//    public String front() {
+//        if (queue.isEmpty()) {
+//            showWarning("Queue is empty");
+//        }
+//        return queue.get(0);
+//    }
+
+
 
     public String front() {
+        if (queue == null) {
+            throw new IllegalStateException("Queue is not initialized");
+        }
         if (queue.isEmpty()) {
-            return null;
+            throw new NoSuchElementException("Queue is empty");
         }
         return queue.get(0);
     }
@@ -101,13 +120,17 @@ public class Queue {
     private void updatePositions() {
         double startX = 50;
         double startY = canvas.getHeight() - 50;
+        double maxWidth = 900; // Approximate canvas width
+        int itemsPerRow = (int) (maxWidth / 110); // Each item is ~110px wide
         for (int i = 0; i < queue.size(); i++) {
+            int row = i / itemsPerRow;
+            int col = i % itemsPerRow;
             Rectangle rect = rectangles.get(i);
             Label label = labels.get(i);
-            rect.setX(startX + i * 110);
-            rect.setY(startY);
-            label.setLayoutX(startX + i * 110 + 30);
-            label.setLayoutY(startY + 10);
+            rect.setX(startX + col * 110);
+            rect.setY(startY - row * 60); // New row every itemsPerRow elements
+            label.setLayoutX(startX + col * 110 + 30);
+            label.setLayoutY(startY - row * 60 + 10);
         }
     }
 }

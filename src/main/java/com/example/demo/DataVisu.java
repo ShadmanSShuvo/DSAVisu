@@ -79,7 +79,8 @@ public class DataVisu extends Application {
         MenuItem queueItem = new MenuItem("Queue");
         MenuItem heapItem = new MenuItem("Heap");
         MenuItem bstItem = new MenuItem("Binary Search Tree");
-        createDataStructureMenu.getItems().addAll(graphItem, linkedListItem, stackItem, queueItem, heapItem, bstItem);
+        MenuItem sortingItem = new MenuItem("Sorting");
+        createDataStructureMenu.getItems().addAll(graphItem, linkedListItem, stackItem, queueItem, heapItem, bstItem, sortingItem);
 
         leftPanel.getChildren().add(createDataStructureMenu);
 
@@ -102,9 +103,9 @@ public class DataVisu extends Application {
             btn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
         }
 
-        HBox controlBar = new HBox(10);
-        controlBar.setPadding(new Insets(10));
-        controlBar.getChildren().addAll(graphButtons);
+        HBox graphControlBar = new HBox(10);
+        graphControlBar.setPadding(new Insets(10));
+        graphControlBar.getChildren().addAll(graphButtons);
 
         Button clearBtn = new Button("Clear");
         clearBtn.setOnAction(e -> clearCurrentStructure());
@@ -126,7 +127,13 @@ public class DataVisu extends Application {
         backBtn.setOnAction(e -> new Program().start(stage));
         backBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
 
-        controlBar.getChildren().addAll(clearBtn, algorithmMenu, backBtn);
+        Button quitBtn = new Button("Quit Program");
+        quitBtn.setOnAction(e -> Platform.exit());
+        quitBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+
+        HBox controlBar = new HBox(10);
+        controlBar.setPadding(new Insets(10));
+        controlBar.getChildren().addAll(clearBtn, algorithmMenu, backBtn, quitBtn);
 
         VBox rightPanel = new VBox(controlBar, canvas);
         VBox.setVgrow(canvas, Priority.ALWAYS);
@@ -138,6 +145,7 @@ public class DataVisu extends Application {
         queueItem.setOnAction(e -> switchToMode(Mode.QUEUE));
         heapItem.setOnAction(e -> switchToMode(Mode.HEAP));
         bstItem.setOnAction(e -> switchToMode(Mode.BST));
+        sortingItem.setOnAction(e -> new SortingAlgorithms().start(stage));
 
         // Graph-specific menu
         MenuButton createGraphMenu = new MenuButton("Create Graph");
@@ -198,6 +206,24 @@ public class DataVisu extends Application {
         leftPanel.getChildren().clear();
         leftPanel.getChildren().add(createDataStructureMenu);
 
+        // Clear existing control bar and rebuild
+        VBox rightPanel = (VBox) canvas.getParent();
+        rightPanel.getChildren().remove(0); // Remove old control bar
+        HBox controlBar = new HBox(10);
+        controlBar.setPadding(new Insets(10));
+        Button clearBtn = new Button("Clear");
+        clearBtn.setOnAction(e -> clearCurrentStructure());
+        clearBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+        Button backBtn = new Button("Back to Main");
+        backBtn.setOnAction(e -> new Program().start(stage));
+        backBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+        Button quitBtn = new Button("Quit Program");
+        quitBtn.setOnAction(e -> Platform.exit());
+        quitBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+
+        MenuButton algorithmMenu = new MenuButton("Choose Algorithm");
+        algorithmMenu.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+
         switch (mode) {
             case GRAPH:
                 createDataStructureMenu.setText("Graph");
@@ -213,43 +239,64 @@ public class DataVisu extends Application {
                 leftPanel.getChildren().add(createGraphMenu);
 
                 adjacencyMatrixItem.setOnAction(e -> {
-                    createDataStructureMenu.setText("Graph: Adjacency Matrix");
+                    createDataStructureMenu.setText("Graph:\nAdjacency Matrix");
                     showTextInputPane("Adjacency Matrix Input", this::parseAdjacencyMatrix);
                 });
                 adjacencyListItem.setOnAction(e -> {
-                    createDataStructureMenu.setText("Graph: Adjacency List");
+                    createDataStructureMenu.setText("Graph:\nAdjacency List");
                     showTextInputPane("Adjacency List Input", this::parseAdjacencyList);
                 });
                 manualEdgesItem.setOnAction(e -> {
-                    createDataStructureMenu.setText("Graph: Manual Edges");
+                    createDataStructureMenu.setText("Graph:\nManual Edges");
                     showTextInputPane("Manual Edges Input\n(Formats: u v  or  u->v  or  u<->v)", this::parseManualEdges);
                 });
                 fileEdgesItem.setOnAction(e -> {
                     createDataStructureMenu.setText("Graph: From File");
                     openFileAndParseEdges();
                 });
+
+                List<String> algorithms = List.of("BFS", "DFS", "Kruskal", "Prim");
+                for (String algo : algorithms) {
+                    MenuItem item = new MenuItem(algo);
+                    item.setOnAction(e -> {
+                        algorithmMenu.setText(algo);
+                        runAlgorithm(algo);
+                    });
+                    algorithmMenu.getItems().add(item);
+                }
+
+                HBox graphControlBar = new HBox(10);
+                graphControlBar.setPadding(new Insets(10));
+                graphControlBar.getChildren().addAll(addNodeBtn, addEdgeBtn, colorBtn, assignWeightBtn, removeNodeBtn, removeEdgeBtn);
+                controlBar.getChildren().addAll(clearBtn, algorithmMenu, graphControlBar, backBtn, quitBtn);
                 break;
             case LINKED_LIST:
                 createDataStructureMenu.setText("Linked List");
                 setupLinkedListControls();
+                controlBar.getChildren().addAll(clearBtn, backBtn, quitBtn);
                 break;
             case STACK:
                 createDataStructureMenu.setText("Stack");
                 setupStackControls();
+                controlBar.getChildren().addAll(clearBtn, backBtn, quitBtn);
                 break;
             case QUEUE:
                 createDataStructureMenu.setText("Queue");
                 setupQueueControls();
+                controlBar.getChildren().addAll(clearBtn, backBtn, quitBtn);
                 break;
             case HEAP:
                 createDataStructureMenu.setText("Heap");
                 setupHeapControls();
+                controlBar.getChildren().addAll(clearBtn, backBtn, quitBtn);
                 break;
             case BST:
                 createDataStructureMenu.setText("Binary Search Tree");
                 setupBSTControls();
+                controlBar.getChildren().addAll(clearBtn, backBtn, quitBtn);
                 break;
         }
+        rightPanel.getChildren().add(0, controlBar);
     }
 
     private void setupLinkedListControls() {
@@ -275,9 +322,14 @@ public class DataVisu extends Application {
             String[] inputs = inputField.getText().trim().split(",");
             if (inputs.length == 2) {
                 try {
+                    String value = inputs[0].trim();
                     int index = Integer.parseInt(inputs[1].trim());
-                    linkedListInsertAt(inputs[0].trim(), index);
-                    inputField.clear();
+                    if (index >= 0 && index <= linkedList.size()) { // Allow insertion at end
+                        linkedListInsertAt(value, index);
+                        inputField.clear();
+                    } else {
+                        showWarning(canvas, "Index out of bounds");
+                    }
                 } catch (NumberFormatException ex) {
                     showWarning(canvas, "Invalid index");
                 }
@@ -291,8 +343,12 @@ public class DataVisu extends Application {
         removeAtBtn.setOnAction(e -> {
             try {
                 int index = Integer.parseInt(inputField.getText().trim());
-                linkedListRemoveAt(index);
-                inputField.clear();
+                if (index >= 0 && index < linkedList.size()) {
+                    linkedListRemoveAt(index);
+                    inputField.clear();
+                } else {
+                    showWarning(canvas, "Invalid index");
+                }
             } catch (NumberFormatException ex) {
                 showWarning(canvas, "Enter a valid index");
             }
@@ -342,12 +398,42 @@ public class DataVisu extends Application {
         leftPanel.getChildren().add(controls);
     }
 
+//    private void setupQueueControls() {
+//        TextField inputField = new TextField();
+//        inputField.setPromptText("Enter value");
+//        Button enqueueBtn = new Button("Enqueue");
+//        Button dequeueBtn = new Button("Dequeue");
+//        Button peekBtn = new Button("Peek");
+//        Button isEmptyBtn = new Button("Is Empty");
+//
+//        enqueueBtn.setOnAction(e -> {
+//            String value = inputField.getText().trim();
+//            if (!value.isEmpty()) {
+//                queue.enqueue(value);
+//                inputField.clear();
+//            } else {
+//                showWarning(canvas, "Please enter a value");
+//            }
+//        });
+//
+//        dequeueBtn.setOnAction(e -> queue.dequeue());
+//
+//        peekBtn.setOnAction(e -> queue.peek());
+//
+//        isEmptyBtn.setOnAction(e -> queue.isEmptyVisual());
+//
+//        VBox controls = new VBox(10, new Label("Queue Operations"), inputField, enqueueBtn, dequeueBtn, peekBtn, isEmptyBtn);
+//        controls.setAlignment(Pos.CENTER);
+//        leftPanel.getChildren().add(controls);
+//    }
+
     private void setupQueueControls() {
         TextField inputField = new TextField();
         inputField.setPromptText("Enter value");
         Button enqueueBtn = new Button("Enqueue");
         Button dequeueBtn = new Button("Dequeue");
         Button peekBtn = new Button("Peek");
+        Button frontBtn = new Button("Front");
         Button isEmptyBtn = new Button("Is Empty");
 
         enqueueBtn.setOnAction(e -> {
@@ -364,9 +450,18 @@ public class DataVisu extends Application {
 
         peekBtn.setOnAction(e -> queue.peek());
 
+        frontBtn.setOnAction(e -> {
+            try {
+                String frontValue = queue.front();
+                showWarning(canvas, "Front element: " + frontValue);
+            } catch (NoSuchElementException ex) {
+                showWarning(canvas, ex.getMessage());
+            }
+        });
+
         isEmptyBtn.setOnAction(e -> queue.isEmptyVisual());
 
-        VBox controls = new VBox(10, new Label("Queue Operations"), inputField, enqueueBtn, dequeueBtn, peekBtn, isEmptyBtn);
+        VBox controls = new VBox(10, new Label("Queue Operations"), inputField, enqueueBtn, dequeueBtn, peekBtn, frontBtn, isEmptyBtn);
         controls.setAlignment(Pos.CENTER);
         leftPanel.getChildren().add(controls);
     }
@@ -554,10 +649,6 @@ public class DataVisu extends Application {
     }
 
     private void linkedListInsertAt(String value, int index) {
-        if (index < 0 || index > linkedList.size()) {
-            showWarning(canvas, "Invalid index");
-            return;
-        }
         Circle circle = new Circle(0, 0, 20);
         circle.setFill(Color.LIGHTYELLOW);
         circle.setStroke(Color.BLACK);
@@ -566,30 +657,34 @@ public class DataVisu extends Application {
         linkedList.add(index, node);
         canvas.getChildren().addAll(circle, label);
         updateLinkedListPositions();
+        highlightNode(node, Color.GREEN);
     }
 
     private void linkedListRemoveAt(int index) {
-        if (index < 0 || index >= linkedList.size()) {
-            showWarning(canvas, "Invalid index");
-            return;
-        }
         LinkedListNode node = linkedList.remove(index);
         canvas.getChildren().removeAll(node.circle, node.label, node.nextArrow);
         updateLinkedListPositions();
     }
 
     private void linkedListSearch(String value) {
-        for (int i = 0; i < linkedList.size(); i++) {
-            LinkedListNode node = linkedList.get(i);
+        boolean found = false;
+        for (LinkedListNode node : linkedList) {
             if (node.value.equals(value)) {
-                node.circle.setFill(Color.GREEN);
-                PauseTransition pt = new PauseTransition(Duration.seconds(2));
-                pt.setOnFinished(e -> node.circle.setFill(Color.LIGHTYELLOW));
-                pt.play();
-                return;
+                highlightNode(node, Color.GREEN);
+                found = true;
+                break; // Highlight first match only
             }
         }
-        showWarning(canvas, "Value not found");
+        if (!found) {
+            showWarning(canvas, "Value not found");
+        }
+    }
+
+    private void highlightNode(LinkedListNode node, Color color) {
+        node.circle.setFill(color);
+        PauseTransition pt = new PauseTransition(Duration.seconds(2));
+        pt.setOnFinished(e -> node.circle.setFill(Color.LIGHTYELLOW));
+        pt.play();
     }
 
     private void removeLinkedListNode() {
