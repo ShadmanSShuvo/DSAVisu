@@ -51,3 +51,4 @@ __pycache__
 *.swp
 .ipynb_checkpoints
 *.egg-info
+.vscode
