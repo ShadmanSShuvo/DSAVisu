@@ -1,13 +1,8 @@
 package com.example.demo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
@@ -15,7 +10,10 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.Group;
 import javafx.stage.Stage;
+
+import java.util.*;
 
 public class SortingAlgorithms extends Application {
 
@@ -26,16 +24,11 @@ public class SortingAlgorithms extends Application {
     private boolean isSorting = false;
     private static final int MAX_HEIGHT = 300;
     private static final int BAR_WIDTH = 20;
-    private static final int BAR_SPACING = 5;
 
     @Override
     public void start(Stage primaryStage) {
         root = new VBox(10);
-        barContainer = new HBox(BAR_SPACING);
-        barContainer.setPrefHeight(MAX_HEIGHT);
-        root.getStyleClass().add("root");
-        barContainer.getStyleClass().add("bar-container");
-
+        barContainer = new HBox(2);
         root.getChildren().add(barContainer);
 
         Button generateBtn = new Button("Generate");
@@ -46,12 +39,6 @@ public class SortingAlgorithms extends Application {
         Button quickSortBtn = new Button("Quick Sort");
         Button backBtn = new Button("Back to Main");
         Button quitBtn = new Button("Quit Program");
-        generateBtn.getStyleClass().add("button");
-        insertionSortBtn.getStyleClass().add("button");
-        mergeSortBtn.getStyleClass().add("button");
-        bubbleSortBtn.getStyleClass().add("button");
-        selectionSortBtn.getStyleClass().add("button");
-        quickSortBtn.getStyleClass().add("button");
 
         generateBtn.setOnAction(e -> generateArray());
         insertionSortBtn.setOnAction(e -> insertionSort());
@@ -68,9 +55,7 @@ public class SortingAlgorithms extends Application {
                 quickSortBtn, backBtn, quitBtn);
         root.getChildren().add(buttons);
 
-        Scene scene = new Scene(root, 700, 500);
-        scene.getStylesheets().add("style.css");
-        //scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+        Scene scene = new Scene(root, 1200, 500);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Sorting Visualization");
         primaryStage.show();
@@ -92,10 +77,7 @@ public class SortingAlgorithms extends Application {
             bar.setFill(Color.BLUE);
             Text text = new Text(String.valueOf(value));
             text.setFill(Color.BLACK);
-            text.getStyleClass().add("bar-label");
-            
             text.setY(-5); // text above the bar
-            text.setX((BAR_WIDTH - text.getLayoutBounds().getWidth()) / 2);
 
             Group group = new Group(bar, text);
             group.setTranslateY(MAX_HEIGHT - value);

@@ -22,8 +22,10 @@ import java.io.File;
 import java.nio.file.Files;
 import java.util.*;
 
+
+
 public class DataVisu extends Application {
-    private enum Mode { GRAPH, LINKED_LIST, STACK, QUEUE, HEAP, BST }
+    private enum Mode { GRAPH, LINKED_LIST, STACK, QUEUE, HEAP, BST, QUIT }
 
     private Mode currentMode;
     private ToggleButton activeButton;
@@ -60,6 +62,7 @@ public class DataVisu extends Application {
             case "Queue": this.currentMode = Mode.QUEUE; break;
             case "Heap": this.currentMode = Mode.HEAP; break;
             case "Binary Search Tree": this.currentMode = Mode.BST; break;
+            case "Quit Program": this.currentMode = Mode.QUIT; break;
             default: this.currentMode = Mode.GRAPH;
         }
     }
@@ -295,6 +298,11 @@ public class DataVisu extends Application {
                 setupBSTControls();
                 controlBar.getChildren().addAll(clearBtn, backBtn, quitBtn);
                 break;
+            case QUIT:
+                createDataStructureMenu.setText("Quit Program");
+                controlBar.getChildren().addAll(quitBtn);
+                break;
+
         }
         rightPanel.getChildren().add(0, controlBar);
     }

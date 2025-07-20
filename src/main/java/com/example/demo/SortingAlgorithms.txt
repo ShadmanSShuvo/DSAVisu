@@ -1,13 +1,8 @@
 package com.example.demo;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.layout.HBox;
@@ -15,7 +10,12 @@ import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Rectangle;
 import javafx.scene.text.Text;
+import javafx.scene.Group;
 import javafx.stage.Stage;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 public class SortingAlgorithms extends Application {
 
@@ -26,51 +26,25 @@ public class SortingAlgorithms extends Application {
     private boolean isSorting = false;
     private static final int MAX_HEIGHT = 300;
     private static final int BAR_WIDTH = 20;
-    private static final int BAR_SPACING = 5;
 
     @Override
     public void start(Stage primaryStage) {
         root = new VBox(10);
-        barContainer = new HBox(BAR_SPACING);
-        barContainer.setPrefHeight(MAX_HEIGHT);
-        root.getStyleClass().add("root");
-        barContainer.getStyleClass().add("bar-container");
-
+        barContainer = new HBox(2);
         root.getChildren().add(barContainer);
 
         Button generateBtn = new Button("Generate");
         Button insertionSortBtn = new Button("Insertion Sort");
         Button mergeSortBtn = new Button("Merge Sort");
-        Button bubbleSortBtn = new Button("Bubble Sort");
-        Button selectionSortBtn = new Button("Selection Sort");
-        Button quickSortBtn = new Button("Quick Sort");
-        Button backBtn = new Button("Back to Main");
-        Button quitBtn = new Button("Quit Program");
-        generateBtn.getStyleClass().add("button");
-        insertionSortBtn.getStyleClass().add("button");
-        mergeSortBtn.getStyleClass().add("button");
-        bubbleSortBtn.getStyleClass().add("button");
-        selectionSortBtn.getStyleClass().add("button");
-        quickSortBtn.getStyleClass().add("button");
 
         generateBtn.setOnAction(e -> generateArray());
         insertionSortBtn.setOnAction(e -> insertionSort());
         mergeSortBtn.setOnAction(e -> mergeSort());
-        bubbleSortBtn.setOnAction(e -> bubbleSort());
-        selectionSortBtn.setOnAction(e -> selectionSort());
-        quickSortBtn.setOnAction(e -> quickSort());
-        backBtn.setOnAction(e -> {
-            new Program().start(primaryStage);
-        });
-        quitBtn.setOnAction(e -> Platform.exit());
 
-        HBox buttons = new HBox(10, generateBtn, insertionSortBtn, mergeSortBtn, bubbleSortBtn, selectionSortBtn,
-                quickSortBtn, backBtn, quitBtn);
+        HBox buttons = new HBox(10, generateBtn, insertionSortBtn, mergeSortBtn);
         root.getChildren().add(buttons);
 
-        Scene scene = new Scene(root, 700, 500);
-        scene.getStylesheets().add("style.css");
-        //scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+        Scene scene = new Scene(root, 1000, 500);
         primaryStage.setScene(scene);
         primaryStage.setTitle("Sorting Visualization");
         primaryStage.show();
@@ -92,10 +66,7 @@ public class SortingAlgorithms extends Application {
             bar.setFill(Color.BLUE);
             Text text = new Text(String.valueOf(value));
             text.setFill(Color.BLACK);
-            text.getStyleClass().add("bar-label");
-            
             text.setY(-5); // text above the bar
-            text.setX((BAR_WIDTH - text.getLayoutBounds().getWidth()) / 2);
 
             Group group = new Group(bar, text);
             group.setTranslateY(MAX_HEIGHT - value);
@@ -125,10 +96,6 @@ public class SortingAlgorithms extends Application {
         });
     }
 
-    private void refreshBarContainer() {
-        Platform.runLater(() -> barContainer.getChildren().setAll(bars));
-    }
-
     private void highlightBars(int i, int j, Color color) {
         Platform.runLater(() -> {
             if (i >= 0 && i < bars.size())
@@ -150,11 +117,6 @@ public class SortingAlgorithms extends Application {
         Collections.swap(array, i, j);
         Collections.swap(bars, i, j);
         updateVisualization();
-        refreshBarContainer();
-    }
-
-    private void pause() throws InterruptedException {
-        Thread.sleep(50);
     }
 
     private void insertionSort() {
@@ -174,17 +136,15 @@ public class SortingAlgorithms extends Application {
                         array.set(j + 1, array.get(j));
                         bars.set(j + 1, bars.get(j));
                         updateVisualization();
-                        refreshBarContainer();
-                        pause();
+                        Thread.sleep(50);
                         j--;
                     }
 
                     array.set(j + 1, key);
                     bars.set(j + 1, keyBar);
                     updateVisualization();
-                    refreshBarContainer();
                     highlightBars(j + 1, -1, Color.GREEN);
-                    pause();
+                    Thread.sleep(50);
                 }
                 resetBarColors();
                 return null;
@@ -237,7 +197,7 @@ public class SortingAlgorithms extends Application {
                 j++;
             }
             updateVisualization();
-            pause();
+            Thread.sleep(50);
         }
 
         while (i <= mid) {
@@ -258,105 +218,7 @@ public class SortingAlgorithms extends Application {
             highlightBars(left + k, -1, Color.GREEN);
         }
         updateVisualization();
-        refreshBarContainer();
-        pause();
-    }
-
-    private void bubbleSort() {
-        if (isSorting)
-            return;
-        isSorting = true;
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                for (int i = 0; i < array.size() - 1; i++) {
-                    for (int j = 0; j < array.size() - i - 1; j++) {
-                        highlightBars(j, j + 1, Color.YELLOW);
-                        if (array.get(j) > array.get(j + 1)) {
-                            swap(j, j + 1);
-                            pause();
-                        }
-                        resetBarColors();
-                    }
-                }
-                resetBarColors();
-                return null;
-            }
-        };
-        task.setOnSucceeded(e -> isSorting = false);
-        new Thread(task).start();
-    }
-
-    private void selectionSort() {
-        if (isSorting)
-            return;
-        isSorting = true;
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                for (int i = 0; i < array.size() - 1; i++) {
-                    int minIdx = i;
-                    for (int j = i + 1; j < array.size(); j++) {
-                        highlightBars(minIdx, j, Color.YELLOW);
-                        if (array.get(j) < array.get(minIdx)) {
-                            minIdx = j;
-                        }
-                        pause();
-                        resetBarColors();
-                    }
-                    if (minIdx != i) {
-                        swap(i, minIdx);
-                        pause();
-                    }
-                }
-                resetBarColors();
-                return null;
-            }
-        };
-        task.setOnSucceeded(e -> isSorting = false);
-        new Thread(task).start();
-    }
-
-    private void quickSort() {
-        if (isSorting)
-            return;
-        isSorting = true;
-        Task<Void> task = new Task<>() {
-            @Override
-            protected Void call() throws Exception {
-                quickSort(0, array.size() - 1);
-                resetBarColors();
-                return null;
-            }
-        };
-        task.setOnSucceeded(e -> isSorting = false);
-        new Thread(task).start();
-    }
-
-    private void quickSort(int low, int high) throws InterruptedException {
-        if (low < high) {
-            int pivotIndex = partition(low, high);
-            quickSort(low, pivotIndex - 1);
-            quickSort(pivotIndex + 1, high);
-        }
-    }
-
-    private int partition(int low, int high) throws InterruptedException {
-        int pivot = array.get(high);
-        int i = low - 1;
-
-        for (int j = low; j < high; j++) {
-            highlightBars(j, high, Color.YELLOW);
-            if (array.get(j) < pivot) {
-                i++;
-                swap(i, j);
-                pause();
-            }
-            resetBarColors();
-        }
-        swap(i + 1, high);
-        pause();
-        return i + 1;
+        Thread.sleep(50);
     }
 
     public static void main(String[] args) {

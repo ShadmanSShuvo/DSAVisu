@@ -1,0 +1,36 @@
+
+.root {
+    -fx-background-color: #f5f6fa;
+    -fx-padding: 20;
+}
+
+.hbox {
+    -fx-alignment: center;
+}
+
+.button {
+    -fx-background-color: #40739e;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8 15;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
+
+.button:hover {
+    -fx-background-color: #2980b9;
+}
+
+.bar-container {
+    -fx-alignment: bottom-center;
+    -fx-padding: 10;
+    -fx-spacing: 5;
+    -fx-pref-height: 300px;
+}
+
+.bar-label {
+    -fx-font-size: 10px;
+    -fx-fill: #2f3640;
+    -fx-text-alignment: center;
+    -fx-alignment: center;
+}

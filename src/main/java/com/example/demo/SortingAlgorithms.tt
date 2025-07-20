@@ -1,0 +1,495 @@
+package com.example.demo;
+
+// it works
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Random;
+
+import javafx.animation.PauseTransition;
+import javafx.application.Application;
+import javafx.application.Platform;
+import javafx.concurrent.Task;
+import javafx.geometry.Insets;
+import javafx.geometry.Pos;
+import javafx.scene.Scene;
+import javafx.scene.control.Button;
+import javafx.scene.control.Label;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
+import javafx.scene.paint.Color;
+import javafx.scene.shape.Rectangle;
+import javafx.stage.Stage;
+import javafx.util.Duration;
+
+public class SortingAlgorithms extends Application {
+    private Pane canvas;
+    private List<Integer> array;
+    private List<Rectangle> bars;
+    private List<Label> labels;
+    private final int ARRAY_SIZE = 10;
+    private final double BAR_WIDTH = 50;
+    private final double MAX_HEIGHT = 300;
+    private boolean isSorting = false;
+
+    @Override
+    public void start(Stage stage) {
+        canvas = new Pane();
+        canvas.setStyle("-fx-background-color: #e6f7ff; -fx-border-color: #dcdcdc;");
+        array = new ArrayList<>();
+        bars = new ArrayList<>();
+        labels = new ArrayList<>();
+
+        randomizeArray();
+
+        Button bubbleSortBtn = new Button("Bubble Sort");
+        Button selectionSortBtn = new Button("Selection Sort");
+        Button insertionSortBtn = new Button("Insertion Sort");
+        Button mergeSortBtn = new Button("Merge Sort");
+        Button quickSortBtn = new Button("Quick Sort");
+        Button heapSortBtn = new Button("Heap Sort");
+        Button randomizeBtn = new Button("Randomize");
+        Button clearBtn = new Button("Clear");
+        Button backBtn = new Button("Back to Main");
+        Button quitBtn = new Button("Quit Program");
+
+        List<Button> buttons = List.of(bubbleSortBtn, selectionSortBtn, insertionSortBtn, mergeSortBtn, quickSortBtn,
+                heapSortBtn, randomizeBtn, clearBtn, backBtn, quitBtn);
+
+        for (Button btn : buttons) {
+            btn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+            btn.setOnMouseEntered(e -> btn.setStyle(
+                    "-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5; -fx-background-color: #4CAF50; -fx-text-fill: white;"));
+            btn.setOnMouseExited(e -> btn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;"));
+        }
+
+        bubbleSortBtn.setOnAction(e -> {
+            if (!isSorting)
+                bubbleSort();
+        });
+        selectionSortBtn.setOnAction(e -> {
+            if (!isSorting)
+                selectionSort();
+        });
+        insertionSortBtn.setOnAction(e -> {
+            if (!isSorting)
+                insertionSort();
+        });
+        mergeSortBtn.setOnAction(e -> {
+            if (!isSorting)
+                mergeSort();
+        });
+        quickSortBtn.setOnAction(e -> {
+            if (!isSorting)
+                quickSort();
+        });
+        heapSortBtn.setOnAction(e -> {
+            if (!isSorting)
+                heapSort();
+        });
+        randomizeBtn.setOnAction(e -> {
+            if (!isSorting)
+                randomizeArray();
+        });
+        clearBtn.setOnAction(e -> {
+            if (!isSorting)
+                clearCanvas();
+        });
+        backBtn.setOnAction(e -> {
+            new Program().start(stage);
+        }); // if (!isSorting)
+        quitBtn.setOnAction(e -> Platform.exit());
+
+        HBox controlBar = new HBox(10);
+        controlBar.setPadding(new Insets(10));
+        controlBar.getChildren().addAll(buttons);
+        controlBar.setAlignment(Pos.CENTER);
+
+        VBox root = new VBox(controlBar, canvas);
+        VBox.setVgrow(canvas, Priority.ALWAYS);
+
+        Scene scene = new Scene(root, 1200, 700);
+        scene.getStylesheets().add("styles.css");
+        stage.setTitle("Sorting Visualizer");
+        stage.setScene(scene);
+        stage.show();
+
+        updateVisualization();
+    }
+
+    private void randomizeArray() {
+        array.clear();
+        Random rand = new Random();
+        for (int i = 0; i < ARRAY_SIZE; i++) {
+            array.add(rand.nextInt(100) + 1);
+        }
+        updateVisualization();
+    }
+
+    private void clearCanvas() {
+        canvas.getChildren().clear();
+        array.clear();
+        bars.clear();
+        labels.clear();
+        randomizeArray();
+    }
+
+    private void updateVisualization() {
+        canvas.getChildren().clear();
+        bars.clear();
+        labels.clear();
+
+        double startX = (canvas.getWidth() - ARRAY_SIZE * BAR_WIDTH) / 2;
+        double startY = canvas.getHeight() - 50;
+
+        for (int i = 0; i < array.size(); i++) {
+            int value = array.get(i);
+            double height = (value / 100.0) * MAX_HEIGHT;
+            Rectangle bar = new Rectangle(startX + i * BAR_WIDTH, startY - height, BAR_WIDTH - 5, height);
+            bar.setFill(Color.LIGHTBLUE);
+            bar.setStroke(Color.BLACK);
+            Label label = new Label(String.valueOf(value));
+            label.setLayoutX(startX + i * BAR_WIDTH + (BAR_WIDTH - 5) / 2 - 10);
+            label.setLayoutY(startY - height - 20);
+            label.setStyle("-fx-font-size: 12px; -fx-font-weight: bold;");
+            bars.add(bar);
+            labels.add(label);
+            canvas.getChildren().addAll(bar, label);
+        }
+    }
+    
+    private void updateBarsFromArray() {
+        Platform.runLater(() -> {
+            for (int i = 0; i < ARRAY_SIZE; i++) {
+                int value = array.get(i);
+                Rectangle bar = bars.get(i);
+                double height = (value / 100.0) * MAX_HEIGHT;
+
+                bar.setHeight(height);
+                bar.setY(MAX_HEIGHT - height);
+                bar.setX(i * BAR_WIDTH); // Fix alignment issue
+            }
+        });
+    }
+
+    private void highlightBars(int index1, int index2, Color color) {
+        Platform.runLater(() -> {
+            if (index1 >= 0 && index1 < bars.size())
+                bars.get(index1).setFill(color);
+            if (index2 >= 0 && index2 < bars.size())
+                bars.get(index2).setFill(color);
+        });
+        PauseTransition pt = new PauseTransition(Duration.seconds(0.5));
+        pt.setOnFinished(e -> Platform.runLater(() -> {
+            if (index1 >= 0 && index1 < bars.size())
+                bars.get(index1).setFill(Color.LIGHTBLUE);
+            if (index2 >= 0 && index2 < bars.size())
+                bars.get(index2).setFill(Color.LIGHTBLUE);
+        }));
+        pt.play();
+    }
+
+    private void swap(int i, int j) {
+        int temp = array.get(i);
+        array.set(i, array.get(j));
+        array.set(j, temp);
+        Platform.runLater(() -> {
+            double startX = (canvas.getWidth() - ARRAY_SIZE * BAR_WIDTH) / 2;
+            double startY = canvas.getHeight() - 50;
+
+            Rectangle barI = bars.get(i);
+            Rectangle barJ = bars.get(j);
+            Label labelI = labels.get(i);
+            Label labelJ = labels.get(j);
+
+            double heightI = (array.get(i) / 100.0) * MAX_HEIGHT;
+            double heightJ = (array.get(j) / 100.0) * MAX_HEIGHT;
+
+            barI.setX(startX + j * BAR_WIDTH);
+            barI.setY(startY - heightI);
+            barJ.setX(startX + i * BAR_WIDTH);
+            barJ.setY(startY - heightJ);
+
+            labelI.setLayoutX(startX + j * BAR_WIDTH + (BAR_WIDTH - 5) / 2 - 10);
+            labelI.setLayoutY(startY - heightI - 20);
+            labelJ.setLayoutX(startX + i * BAR_WIDTH + (BAR_WIDTH - 5) / 2 - 10);
+            labelJ.setLayoutY(startY - heightJ - 20);
+
+            bars.set(i, barJ);
+            bars.set(j, barI);
+            labels.set(i, labelJ);
+            labels.set(j, labelI);
+
+            highlightBars(i, j, Color.GREEN);
+        });
+    }
+
+    private void bubbleSort() {
+        if (isSorting)
+            return;
+        isSorting = true;
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                for (int i = 0; i < array.size() - 1; i++) {
+                    for (int j = 0; j < array.size() - i - 1; j++) {
+                        highlightBars(j, j + 1, Color.YELLOW);
+                        if (array.get(j) > array.get(j + 1)) {
+                            swap(j, j + 1);
+                        }
+                        Thread.sleep(5); // Match PauseTransition duration
+                    }
+                }
+                return null;
+            }
+        };
+        task.setOnSucceeded(e -> isSorting = false);
+        new Thread(task).start();
+    }
+
+    private void selectionSort() {
+        if (isSorting)
+            return;
+        isSorting = true;
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                for (int i = 0; i < array.size() - 1; i++) {
+                    int minIdx = i;
+                    for (int j = i + 1; j < array.size(); j++) {
+                        highlightBars(minIdx, j, Color.YELLOW);
+                        if (array.get(j) < array.get(minIdx))
+                            minIdx = j;
+                        Thread.sleep(5);
+                    }
+                    if (minIdx != i)
+                        swap(i, minIdx);
+                }
+                return null;
+            }
+        };
+        task.setOnSucceeded(e -> isSorting = false);
+        new Thread(task).start();
+    }
+
+    private void insertionSort() {
+        if (isSorting)
+            return;
+        isSorting = true;
+
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                for (int i = 1; i < array.size(); i++) {
+                    int j = i;
+                    while (j > 0 && array.get(j) < array.get(j - 1)) {
+                        highlightBars(j, j - 1, Color.YELLOW);
+                        swap(j, j - 1);
+                        Thread.sleep(50);
+                        j--;
+                    }
+                }
+        return null;
+            }
+        };
+
+        task.setOnSucceeded(e -> isSorting = false);
+        new Thread(task).start();
+    }
+
+    private void mergeSort() {
+        if (isSorting)
+            return;
+        isSorting = true;
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                mergeSort(0, array.size() - 1);
+                return null;
+            }
+        };
+        task.setOnSucceeded(e -> isSorting = false);
+        new Thread(task).start();
+    }
+
+    private void mergeSort(int left, int right) {
+        if (left < right) {
+            int mid = left + (right - left) / 2;
+            mergeSort(left, mid);
+            mergeSort(mid + 1, right);
+            merge(left, mid, right);
+        }
+    }
+
+    private void sleep(int millis) {
+        try {
+            Thread.sleep(millis);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+    }
+
+    
+    private void merge(int left, int mid, int right) {
+        List<Integer> temp = new ArrayList<>();
+        List<Integer> indices = new ArrayList<>();
+        int i = left, j = mid + 1;
+
+        while (i <= mid && j <= right) {
+            highlightBars(i, j, Color.YELLOW);
+            if (array.get(i) <= array.get(j)) {
+                temp.add(array.get(i));
+                indices.add(i);
+                i++;
+            } else {
+                temp.add(array.get(j));
+                indices.add(j);
+                j++;
+            }
+            Platform.runLater(() -> updateVisualization());
+            sleep(50);
+        }
+    
+            highlightBars(i, j, Color.YELLOW);
+            if (array.get(i) <= array.get(j)) {
+                temp.add(array.get(i++));
+            } else {
+                temp.add(array.get(j++));
+            }
+            updateBarsFromArray(); // ✅ Visual update
+            sleep(20);
+        }
+
+        while (i <= mid) {
+            temp.add(array.get(i++));
+            highlightBars(i - 1, -1, Color.YELLOW);
+            updateBarsFromArray();
+            sleep(20);
+        }
+
+        while (j <= right) {
+            temp.add(array.get(j++));
+            highlightBars(j - 1, -1, Color.YELLOW);
+            updateBarsFromArray();
+            sleep(20);
+        }
+        while (i <= mid) {
+            temp.add(array.get(i));
+            indices.add(i++);
+        }
+        while (j <= right) {
+            temp.add(array.get(j));
+            indices.add(j++);
+        }
+
+        for (int k = 0; k < temp.size(); k++) {
+            array.set(left + k, temp.get(k));
+        }
+
+        Platform.runLater(() -> updateVisualization());
+        sleep(50);
+    }
+
+
+        for (int k = 0; k < temp.size(); k++) {
+            array.set(left + k, temp.get(k));
+            highlightBars(left + k, -1, Color.GREEN);
+            updateBarsFromArray(); // ✅ Immediately after placing each element
+            sleep(20);
+        }
+    }
+
+    private void quickSort() {
+        if (isSorting)
+            return;
+        isSorting = true;
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                quickSort(0, array.size() - 1);
+                return null;
+            }
+        };
+        task.setOnSucceeded(e -> isSorting = false);
+        new Thread(task).start();
+    }
+
+    private void quickSort(int low, int high) {
+        if (low < high) {
+            int pi = partition(low, high);
+            quickSort(low, pi - 1);
+            quickSort(pi + 1, high);
+        }
+    }
+
+    private int partition(int low, int high) {
+        int pivot = array.get(high);
+        highlightBars(high, -1, Color.RED);
+        int i = low - 1;
+        for (int j = low; j < high; j++) {
+            highlightBars(j, high, Color.YELLOW);
+            if (array.get(j) <= pivot) {
+                i++;
+                swap(i, j);
+            }
+            try {
+                Thread.sleep(5);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+        }
+        swap(i + 1, high);
+        return i + 1;
+    }
+
+    private void heapSort() {
+        if (isSorting)
+            return;
+        isSorting = true;
+        Task<Void> task = new Task<>() {
+            @Override
+            protected Void call() throws Exception {
+                int n = array.size();
+                for (int i = n / 2 - 1; i >= 0; i--) {
+                    heapify(n, i);
+                }
+                for (int i = n - 1; i > 0; i--) {
+                    swap(0, i);
+                    heapify(i, 0);
+                }
+                return null;
+            }
+        };
+        task.setOnSucceeded(e -> isSorting = false);
+        new Thread(task).start();
+    }
+
+    private void heapify(int n, int i) {
+        int largest = i;
+        int left = 2 * i + 1;
+        int right = 2 * i + 2;
+
+        if (left < n && array.get(left) > array.get(largest)) {
+            largest = left;
+            highlightBars(left, largest, Color.YELLOW);
+        }
+        if (right < n && array.get(right) > array.get(largest)) {
+            largest = right;
+            highlightBars(right, largest, Color.YELLOW);
+        }
+        if (largest != i) {
+            swap(i, largest);
+            heapify(n, largest);
+        }
+        try {
+            Thread.sleep(5);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public static void main(String[] args) {
+        launch(args);
+    }
+}
