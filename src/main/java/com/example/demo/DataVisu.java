@@ -1,12 +1,39 @@
 package com.example.demo;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.NoSuchElementException;
+import java.util.Optional;
+import java.util.Set;
+
+import javafx.animation.PauseTransition;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.*;
-import javafx.scene.layout.*;
+import javafx.scene.control.Button;
+import javafx.scene.control.ColorPicker;
+import javafx.scene.control.Label;
+import javafx.scene.control.Menu;
+import javafx.scene.control.MenuButton;
+import javafx.scene.control.MenuItem;
+import javafx.scene.control.ScrollPane;
+import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextInputDialog;
+import javafx.scene.control.ToggleButton;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.Pane;
+import javafx.scene.layout.Priority;
+import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.scene.shape.Line;
@@ -16,16 +43,11 @@ import javafx.stage.FileChooser;
 import javafx.stage.Popup;
 import javafx.stage.Stage;
 import javafx.util.Duration;
-import javafx.animation.PauseTransition;
-
-import java.io.File;
-import java.nio.file.Files;
-import java.util.*;
-
-
 
 public class DataVisu extends Application {
-    private enum Mode { GRAPH, LINKED_LIST, STACK, QUEUE, HEAP, BST, QUIT }
+    private enum Mode {
+        GRAPH, LINKED_LIST, STACK, QUEUE, HEAP, BST, QUIT
+    }
 
     private Mode currentMode;
     private ToggleButton activeButton;
@@ -56,14 +78,29 @@ public class DataVisu extends Application {
     public DataVisu(String mode) {
         this.initialMode = mode;
         switch (mode) {
-            case "Graph": this.currentMode = Mode.GRAPH; break;
-            case "Linked List": this.currentMode = Mode.LINKED_LIST; break;
-            case "Stack": this.currentMode = Mode.STACK; break;
-            case "Queue": this.currentMode = Mode.QUEUE; break;
-            case "Heap": this.currentMode = Mode.HEAP; break;
-            case "Binary Search Tree": this.currentMode = Mode.BST; break;
-            case "Quit Program": this.currentMode = Mode.QUIT; break;
-            default: this.currentMode = Mode.GRAPH;
+            case "Graph":
+                this.currentMode = Mode.GRAPH;
+                break;
+            case "Linked List":
+                this.currentMode = Mode.LINKED_LIST;
+                break;
+            case "Stack":
+                this.currentMode = Mode.STACK;
+                break;
+            case "Queue":
+                this.currentMode = Mode.QUEUE;
+                break;
+            case "Heap":
+                this.currentMode = Mode.HEAP;
+                break;
+            case "Binary Search Tree":
+                this.currentMode = Mode.BST;
+                break;
+            case "Quit Program":
+                this.currentMode = Mode.QUIT;
+                break;
+            default:
+                this.currentMode = Mode.GRAPH;
         }
     }
 
@@ -71,7 +108,7 @@ public class DataVisu extends Application {
     public void start(Stage stage) {
         this.stage = stage;
         leftPanel = new VBox(10);
-        leftPanel.setPrefWidth(300);
+        leftPanel.setPrefWidth(100);
         leftPanel.setPadding(new Insets(10));
         leftPanel.setStyle("-fx-background-color: #ffffff; -fx-border-color: #dcdcdc; -fx-border-width: 1;");
 
@@ -83,7 +120,8 @@ public class DataVisu extends Application {
         MenuItem heapItem = new MenuItem("Heap");
         MenuItem bstItem = new MenuItem("Binary Search Tree");
         MenuItem sortingItem = new MenuItem("Sorting");
-        createDataStructureMenu.getItems().addAll(graphItem, linkedListItem, stackItem, queueItem, heapItem, bstItem, sortingItem);
+        createDataStructureMenu.getItems().addAll(graphItem, linkedListItem, stackItem, queueItem, heapItem, bstItem,
+                sortingItem);
 
         leftPanel.getChildren().add(createDataStructureMenu);
 
@@ -98,12 +136,12 @@ public class DataVisu extends Application {
         removeEdgeBtn = new ToggleButton("Remove Edge");
 
         List<ToggleButton> graphButtons = List.of(
-                addNodeBtn, addEdgeBtn, colorBtn, assignWeightBtn, removeNodeBtn, removeEdgeBtn
-        );
+                addNodeBtn, addEdgeBtn, colorBtn, assignWeightBtn, removeNodeBtn, removeEdgeBtn);
 
         for (ToggleButton btn : graphButtons) {
             btn.setOnAction(e -> activateMode(btn));
-            btn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+            btn.setStyle(
+                    "-fx-background-color: #40739e; -fx-text-fill: white; -fx-font-weight: bold; -fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 15; -fx-cursor: hand;");
         }
 
         HBox graphControlBar = new HBox(10);
@@ -112,7 +150,7 @@ public class DataVisu extends Application {
 
         Button clearBtn = new Button("Clear");
         clearBtn.setOnAction(e -> clearCurrentStructure());
-        clearBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+        clearBtn.setStyle("-fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 5;");
 
         MenuButton algorithmMenu = new MenuButton("Choose Algorithm");
         List<String> algorithms = List.of("BFS", "DFS", "Kruskal", "Prim");
@@ -124,15 +162,19 @@ public class DataVisu extends Application {
             });
             algorithmMenu.getItems().add(item);
         }
-        algorithmMenu.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+        algorithmMenu.setStyle("-fx-background-color: #40739e;\n" + //
+                "    -fx-text-fill: white;\n" + //
+                "    -fx-font-weight: bold;\n" + //
+                "    -fx-background-radius: 15;\n" + //
+                "    -fx-cursor: hand;-fx-font-size: 10px; -fx-padding: 5px;");
 
         Button backBtn = new Button("Back to Main");
         backBtn.setOnAction(e -> new Program().start(stage));
-        backBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+        backBtn.setStyle("-fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 15;");
 
         Button quitBtn = new Button("Quit Program");
         quitBtn.setOnAction(e -> Platform.exit());
-        quitBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+        quitBtn.setStyle("-fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 15;");
 
         HBox controlBar = new HBox(10);
         controlBar.setPadding(new Insets(10));
@@ -159,7 +201,7 @@ public class DataVisu extends Application {
         MenuItem fileEdgesItem = new MenuItem("From File");
         menuUsingEdges.getItems().addAll(manualEdgesItem, fileEdgesItem);
         createGraphMenu.getItems().addAll(adjacencyMatrixItem, adjacencyListItem, menuUsingEdges);
-        createGraphMenu.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+        createGraphMenu.setStyle("-fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 5;");
 
         adjacencyMatrixItem.setOnAction(e -> {
             createDataStructureMenu.setText("Graph: Adjacency Matrix");
@@ -189,7 +231,7 @@ public class DataVisu extends Application {
         HBox root = new HBox(leftPanel, rightPanel);
         HBox.setHgrow(rightPanel, Priority.ALWAYS);
 
-        Scene scene = new Scene(root, 1200, 700);
+        Scene scene = new Scene(root, 1000, 600);
         scene.getStylesheets().add("styles.css");
         stage.setTitle("Data Structure Visualizer - " + initialMode);
         stage.setScene(scene);
@@ -216,16 +258,16 @@ public class DataVisu extends Application {
         controlBar.setPadding(new Insets(10));
         Button clearBtn = new Button("Clear");
         clearBtn.setOnAction(e -> clearCurrentStructure());
-        clearBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+        clearBtn.setStyle("-fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 5;");
         Button backBtn = new Button("Back to Main");
         backBtn.setOnAction(e -> new Program().start(stage));
-        backBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+        backBtn.setStyle("-fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 5;");
         Button quitBtn = new Button("Quit Program");
         quitBtn.setOnAction(e -> Platform.exit());
-        quitBtn.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+        quitBtn.setStyle("-fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 5;");
 
         MenuButton algorithmMenu = new MenuButton("Choose Algorithm");
-        algorithmMenu.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+        algorithmMenu.setStyle("-fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 5;");
 
         switch (mode) {
             case GRAPH:
@@ -238,7 +280,7 @@ public class DataVisu extends Application {
                 MenuItem fileEdgesItem = new MenuItem("From File");
                 menuUsingEdges.getItems().addAll(manualEdgesItem, fileEdgesItem);
                 createGraphMenu.getItems().addAll(adjacencyMatrixItem, adjacencyListItem, menuUsingEdges);
-                createGraphMenu.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+                createGraphMenu.setStyle("-fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 5;");
                 leftPanel.getChildren().add(createGraphMenu);
 
                 adjacencyMatrixItem.setOnAction(e -> {
@@ -251,7 +293,8 @@ public class DataVisu extends Application {
                 });
                 manualEdgesItem.setOnAction(e -> {
                     createDataStructureMenu.setText("Graph:\nManual Edges");
-                    showTextInputPane("Manual Edges Input\n(Formats: u v  or  u->v  or  u<->v)", this::parseManualEdges);
+                    showTextInputPane("Manual Edges Input\n(Formats: u v  or  u->v  or  u<->v)",
+                            this::parseManualEdges);
                 });
                 fileEdgesItem.setOnAction(e -> {
                     createDataStructureMenu.setText("Graph: From File");
@@ -270,7 +313,8 @@ public class DataVisu extends Application {
 
                 HBox graphControlBar = new HBox(10);
                 graphControlBar.setPadding(new Insets(10));
-                graphControlBar.getChildren().addAll(addNodeBtn, addEdgeBtn, colorBtn, assignWeightBtn, removeNodeBtn, removeEdgeBtn);
+                graphControlBar.getChildren().addAll(addNodeBtn, addEdgeBtn, colorBtn, assignWeightBtn, removeNodeBtn,
+                        removeEdgeBtn);
                 controlBar.getChildren().addAll(clearBtn, algorithmMenu, graphControlBar, backBtn, quitBtn);
                 break;
             case LINKED_LIST:
@@ -372,7 +416,8 @@ public class DataVisu extends Application {
             }
         });
 
-        VBox controls = new VBox(10, new Label("Linked List Operations"), inputField, addBtn, insertAtBtn, removeBtn, removeAtBtn, searchBtn);
+        VBox controls = new VBox(10, new Label("Linked List Operations"), inputField, addBtn, insertAtBtn, removeBtn,
+                removeAtBtn, searchBtn);
         controls.setAlignment(Pos.CENTER);
         leftPanel.getChildren().add(controls);
     }
@@ -406,34 +451,35 @@ public class DataVisu extends Application {
         leftPanel.getChildren().add(controls);
     }
 
-//    private void setupQueueControls() {
-//        TextField inputField = new TextField();
-//        inputField.setPromptText("Enter value");
-//        Button enqueueBtn = new Button("Enqueue");
-//        Button dequeueBtn = new Button("Dequeue");
-//        Button peekBtn = new Button("Peek");
-//        Button isEmptyBtn = new Button("Is Empty");
-//
-//        enqueueBtn.setOnAction(e -> {
-//            String value = inputField.getText().trim();
-//            if (!value.isEmpty()) {
-//                queue.enqueue(value);
-//                inputField.clear();
-//            } else {
-//                showWarning(canvas, "Please enter a value");
-//            }
-//        });
-//
-//        dequeueBtn.setOnAction(e -> queue.dequeue());
-//
-//        peekBtn.setOnAction(e -> queue.peek());
-//
-//        isEmptyBtn.setOnAction(e -> queue.isEmptyVisual());
-//
-//        VBox controls = new VBox(10, new Label("Queue Operations"), inputField, enqueueBtn, dequeueBtn, peekBtn, isEmptyBtn);
-//        controls.setAlignment(Pos.CENTER);
-//        leftPanel.getChildren().add(controls);
-//    }
+    // private void setupQueueControls() {
+    // TextField inputField = new TextField();
+    // inputField.setPromptText("Enter value");
+    // Button enqueueBtn = new Button("Enqueue");
+    // Button dequeueBtn = new Button("Dequeue");
+    // Button peekBtn = new Button("Peek");
+    // Button isEmptyBtn = new Button("Is Empty");
+    //
+    // enqueueBtn.setOnAction(e -> {
+    // String value = inputField.getText().trim();
+    // if (!value.isEmpty()) {
+    // queue.enqueue(value);
+    // inputField.clear();
+    // } else {
+    // showWarning(canvas, "Please enter a value");
+    // }
+    // });
+    //
+    // dequeueBtn.setOnAction(e -> queue.dequeue());
+    //
+    // peekBtn.setOnAction(e -> queue.peek());
+    //
+    // isEmptyBtn.setOnAction(e -> queue.isEmptyVisual());
+    //
+    // VBox controls = new VBox(10, new Label("Queue Operations"), inputField,
+    // enqueueBtn, dequeueBtn, peekBtn, isEmptyBtn);
+    // controls.setAlignment(Pos.CENTER);
+    // leftPanel.getChildren().add(controls);
+    // }
 
     private void setupQueueControls() {
         TextField inputField = new TextField();
@@ -469,7 +515,8 @@ public class DataVisu extends Application {
 
         isEmptyBtn.setOnAction(e -> queue.isEmptyVisual());
 
-        VBox controls = new VBox(10, new Label("Queue Operations"), inputField, enqueueBtn, dequeueBtn, peekBtn, frontBtn, isEmptyBtn);
+        VBox controls = new VBox(10, new Label("Queue Operations"), inputField, enqueueBtn, dequeueBtn, peekBtn,
+                frontBtn, isEmptyBtn);
         controls.setAlignment(Pos.CENTER);
         leftPanel.getChildren().add(controls);
     }
@@ -499,7 +546,8 @@ public class DataVisu extends Application {
 
         isEmptyBtn.setOnAction(e -> heap.isEmptyVisual());
 
-        VBox controls = new VBox(10, new Label("Heap Operations"), inputField, insertBtn, removeMaxBtn, peekBtn, isEmptyBtn);
+        VBox controls = new VBox(10, new Label("Heap Operations"), inputField, insertBtn, removeMaxBtn, peekBtn,
+                isEmptyBtn);
         controls.setAlignment(Pos.CENTER);
         leftPanel.getChildren().add(controls);
     }
@@ -552,10 +600,12 @@ public class DataVisu extends Application {
     private void activateMode(ToggleButton btn) {
         if (activeButton != null && activeButton != btn) {
             activeButton.setSelected(false);
-            activeButton.setStyle("-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+            activeButton.setStyle("-fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 5;");
         }
         activeButton = btn.isSelected() ? btn : null;
-        btn.setStyle(btn.isSelected() ? "-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;" : "-fx-font-size: 14px; -fx-padding: 8px; -fx-background-radius: 5;");
+        btn.setStyle(btn.isSelected()
+                ? "-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 5;"
+                : "-fx-font-size: 10px; -fx-padding: 5px; -fx-background-radius: 5;");
 
         if (activeButton != null && selectedNode != null) {
             selectedNode.arrow.setVisible(false);
@@ -580,7 +630,8 @@ public class DataVisu extends Application {
         circle.setOnMouseClicked(e -> {
             e.consume();
             if (activeButton == null) {
-                if (selectedNode != null) selectedNode.arrow.setVisible(false);
+                if (selectedNode != null)
+                    selectedNode.arrow.setVisible(false);
                 selectedNode = node;
                 updateArrowPosition(node);
                 node.arrow.setVisible(true);
@@ -594,8 +645,7 @@ public class DataVisu extends Application {
                 } else if (selectedNode != node) {
                     Line line = new Line(
                             selectedNode.circle.getCenterX(), selectedNode.circle.getCenterY(),
-                            node.circle.getCenterX(), node.circle.getCenterY()
-                    );
+                            node.circle.getCenterX(), node.circle.getCenterY());
                     line.setStrokeWidth(3);
                     Graph.GraphEdge edge = new Graph.GraphEdge(selectedNode, node, line);
                     graphEdges.add(edge);
@@ -608,7 +658,8 @@ public class DataVisu extends Application {
 
                     line.setOnMouseClicked(ev -> {
                         ev.consume();
-                        if (activeButton == assignWeightBtn) showWeightDialog(canvas, edge);
+                        if (activeButton == assignWeightBtn)
+                            showWeightDialog(canvas, edge);
                         else if (activeButton == removeEdgeBtn) {
                             canvas.getChildren().removeAll(line, edge.weightLabel);
                             graphEdges.remove(edge);
@@ -627,7 +678,8 @@ public class DataVisu extends Application {
                     popup.hide();
                 });
                 picker.focusedProperty().addListener((obs, oldVal, newVal) -> {
-                    if (!newVal) popup.hide();
+                    if (!newVal)
+                        popup.hide();
                 });
             } else if (activeButton == removeNodeBtn) {
                 canvas.getChildren().removeAll(node.circle, node.label, node.arrow);
@@ -640,7 +692,8 @@ public class DataVisu extends Application {
                 }
                 graphEdges.removeAll(toRemove);
                 graphNodes.remove(node);
-                if (selectedNode == node) selectedNode = null;
+                if (selectedNode == node)
+                    selectedNode = null;
             }
         });
     }
@@ -739,7 +792,8 @@ public class DataVisu extends Application {
         double dx = x2 - x1;
         double dy = y2 - y1;
         double len = Math.hypot(dx, dy);
-        if (len == 0) len = 1;
+        if (len == 0)
+            len = 1;
         double perpX = -dy / len;
         double perpY = dx / len;
 
@@ -793,7 +847,8 @@ public class DataVisu extends Application {
 
     private void showWarning(Pane canvas, String msg) {
         Label warning = new Label(msg);
-        warning.setStyle("-fx-background-color: #ffeb3b; -fx-text-fill: #d32f2f; -fx-padding: 5; -fx-border-radius: 5;");
+        warning.setStyle(
+                "-fx-background-color: #ffeb3b; -fx-text-fill: #d32f2f; -fx-padding: 5; -fx-border-radius: 5;");
         warning.setLayoutX(10);
         warning.setLayoutY(10);
         canvas.getChildren().add(warning);
@@ -857,10 +912,18 @@ public class DataVisu extends Application {
     private void runAlgorithm(String algorithm) {
         GraphAlgorithms algo = new GraphAlgorithms(graphNodes, graphEdges, canvas);
         switch (algorithm) {
-            case "BFS": algo.bfs(0); break;
-            case "DFS": algo.dfs(0); break;
-            case "Kruskal": algo.kruskal(); break;
-            case "Prim": algo.prim(); break;
+            case "BFS":
+                algo.bfs(0);
+                break;
+            case "DFS":
+                algo.dfs(0);
+                break;
+            case "Kruskal":
+                algo.kruskal();
+                break;
+            case "Prim":
+                algo.prim();
+                break;
         }
     }
 
@@ -929,7 +992,8 @@ public class DataVisu extends Application {
             } else if (title.contains("Adjacency List")) {
                 success = removeNodeAdjList(textArea);
             }
-            if (!success) showWarning(canvas, "Cannot reduce below 1 node");
+            if (!success)
+                showWarning(canvas, "Cannot reduce below 1 node");
         });
 
         clearBtn.setOnAction(e -> setDefaultContent.run());
@@ -957,9 +1021,11 @@ public class DataVisu extends Application {
         for (int i = 0; i < size; i++) {
             for (int j = 0; j < size; j++) {
                 sb.append('0');
-                if (j < size - 1) sb.append(' ');
+                if (j < size - 1)
+                    sb.append(' ');
             }
-            if (i < size - 1) sb.append('\n');
+            if (i < size - 1)
+                sb.append('\n');
         }
         return sb.toString();
     }
@@ -987,7 +1053,8 @@ public class DataVisu extends Application {
         }
 
         List<String> newRow = new ArrayList<>();
-        for (int i = 0; i < n + 1; i++) newRow.add("0");
+        for (int i = 0; i < n + 1; i++)
+            newRow.add("0");
         matrix.add(newRow);
 
         StringBuilder sb = new StringBuilder();
@@ -1000,7 +1067,8 @@ public class DataVisu extends Application {
     private boolean removeNodeAdjMatrix(TextArea textArea) {
         String[] lines = textArea.getText().split("\n");
         int n = lines.length;
-        if (n <= 1) return false;
+        if (n <= 1)
+            return false;
 
         List<List<String>> matrix = new ArrayList<>();
         for (String line : lines) {
@@ -1009,7 +1077,8 @@ public class DataVisu extends Application {
         }
 
         for (List<String> row : matrix) {
-            if (!row.isEmpty()) row.remove(row.size() - 1);
+            if (!row.isEmpty())
+                row.remove(row.size() - 1);
         }
 
         matrix.remove(matrix.size() - 1);
@@ -1037,7 +1106,8 @@ public class DataVisu extends Application {
     private boolean removeNodeAdjList(TextArea textArea) {
         String[] lines = textArea.getText().split("\n");
         int n = lines.length;
-        if (n <= 1) return false;
+        if (n <= 1)
+            return false;
 
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n - 1; i++) {
@@ -1116,7 +1186,8 @@ public class DataVisu extends Application {
 
             for (String line : lines) {
                 line = line.trim();
-                if (line.isEmpty()) continue;
+                if (line.isEmpty())
+                    continue;
                 String[] parts = line.split(":", 2);
                 if (parts.length != 2) {
                     showWarning(canvas, "Invalid adjacency list format");
@@ -1194,28 +1265,32 @@ public class DataVisu extends Application {
 
             for (String line : lines) {
                 line = line.trim();
-                if (line.isEmpty()) continue;
+                if (line.isEmpty())
+                    continue;
 
                 int u, v;
                 if (line.contains("<->")) {
                     String[] parts = line.split("<->");
-                    if (parts.length != 2) return false;
+                    if (parts.length != 2)
+                        return false;
                     u = Integer.parseInt(parts[0].trim());
                     v = Integer.parseInt(parts[1].trim());
-                    edgesList.add(new int[]{u, v});
-                    edgesList.add(new int[]{v, u});
+                    edgesList.add(new int[] { u, v });
+                    edgesList.add(new int[] { v, u });
                 } else if (line.contains("->")) {
                     String[] parts = line.split("->");
-                    if (parts.length != 2) return false;
+                    if (parts.length != 2)
+                        return false;
                     u = Integer.parseInt(parts[0].trim());
                     v = Integer.parseInt(parts[1].trim());
-                    edgesList.add(new int[]{u, v});
+                    edgesList.add(new int[] { u, v });
                 } else {
                     String[] parts = line.split("\\s+");
-                    if (parts.length != 2) return false;
+                    if (parts.length != 2)
+                        return false;
                     u = Integer.parseInt(parts[0].trim());
                     v = Integer.parseInt(parts[1].trim());
-                    edgesList.add(new int[]{u, v});
+                    edgesList.add(new int[] { u, v });
                 }
             }
 
@@ -1266,7 +1341,8 @@ public class DataVisu extends Application {
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open Graph Edge File");
         File file = fileChooser.showOpenDialog(stage);
-        if (file == null) return;
+        if (file == null)
+            return;
 
         try {
             List<String> lines = Files.readAllLines(file.toPath());
@@ -1276,7 +1352,8 @@ public class DataVisu extends Application {
             }
             clearCurrentStructure();
             boolean success = parseManualEdges(sb.toString());
-            if (!success) showWarning(canvas, "Failed to parse file edges");
+            if (!success)
+                showWarning(canvas, "Failed to parse file edges");
         } catch (Exception e) {
             e.printStackTrace();
             showWarning(canvas, "Error reading file");
@@ -1285,13 +1362,13 @@ public class DataVisu extends Application {
 
     private void addGraphEdge(Graph.GraphNode from, Graph.GraphNode to) {
         for (Graph.GraphEdge edge : graphEdges) {
-            if (edge.from == from && edge.to == to) return;
+            if (edge.from == from && edge.to == to)
+                return;
         }
 
         Line line = new Line(
                 from.circle.getCenterX(), from.circle.getCenterY(),
-                to.circle.getCenterX(), to.circle.getCenterY()
-        );
+                to.circle.getCenterX(), to.circle.getCenterY());
         line.setStrokeWidth(3);
 
         Graph.GraphEdge edge = new Graph.GraphEdge(from, to, line);
@@ -1303,7 +1380,8 @@ public class DataVisu extends Application {
 
         line.setOnMouseClicked(ev -> {
             ev.consume();
-            if (activeButton == assignWeightBtn) showWeightDialog(canvas, edge);
+            if (activeButton == assignWeightBtn)
+                showWeightDialog(canvas, edge);
             else if (activeButton == removeEdgeBtn) {
                 canvas.getChildren().removeAll(line, edge.weightLabel);
                 graphEdges.remove(edge);
@@ -1314,7 +1392,8 @@ public class DataVisu extends Application {
     private void handleGraphNodeClick(int nodeIndex) {
         Graph.GraphNode node = graphNodes.get(nodeIndex);
         if (activeButton == null) {
-            if (selectedNode != null) selectedNode.arrow.setVisible(false);
+            if (selectedNode != null)
+                selectedNode.arrow.setVisible(false);
             selectedNode = node;
             updateArrowPosition(node);
             node.arrow.setVisible(true);

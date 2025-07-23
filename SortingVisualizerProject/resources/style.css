@@ -12,11 +12,18 @@
     -fx-background-color: #40739e;
     -fx-text-fill: white;
     -fx-font-weight: bold;
-    -fx-padding: 8 15;
+    -fx-padding: 8;
     -fx-background-radius: 8;
     -fx-cursor: hand;
 }
-
+.togglebutton {
+    -fx-background-color: #40739e;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-padding: 8;
+    -fx-background-radius: 8;
+    -fx-cursor: hand;
+}
 .button:hover {
     -fx-background-color: #2980b9;
 }

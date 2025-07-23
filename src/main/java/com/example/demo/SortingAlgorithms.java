@@ -18,15 +18,15 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class SortingAlgorithms extends Application {
-
+    public static final int NUM_BARS = 20;
     private List<Integer> array = new ArrayList<>();
     private List<Group> bars = new ArrayList<>();
     private VBox root;
     private HBox barContainer;
     private boolean isSorting = false;
-    private static final int MAX_HEIGHT = 300;
+    private static final int MAX_HEIGHT = 100;
     private static final int BAR_WIDTH = 20;
-    private static final int BAR_SPACING = 5;
+    private static final int BAR_SPACING = 10;
 
     @Override
     public void start(Stage primaryStage) {
@@ -68,9 +68,9 @@ public class SortingAlgorithms extends Application {
                 quickSortBtn, backBtn, quitBtn);
         root.getChildren().add(buttons);
 
-        Scene scene = new Scene(root, 700, 500);
+        Scene scene = new Scene(root, 900, 600);
         scene.getStylesheets().add("style.css");
-        //scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
+        // scene.getStylesheets().add(getClass().getResource("style.css").toExternalForm());
         primaryStage.setScene(scene);
         primaryStage.setTitle("Sorting Visualization");
         primaryStage.show();
@@ -84,7 +84,8 @@ public class SortingAlgorithms extends Application {
         array.clear();
         bars.clear();
         barContainer.getChildren().clear();
-        for (int i = 0; i < 30; i++) {
+
+        for (int i = 0; i < NUM_BARS; i++) {
             int value = (int) (Math.random() * MAX_HEIGHT) + 20;
             array.add(value);
 
@@ -93,12 +94,12 @@ public class SortingAlgorithms extends Application {
             Text text = new Text(String.valueOf(value));
             text.setFill(Color.BLACK);
             text.getStyleClass().add("bar-label");
-            
-            text.setY(-5); // text above the bar
+
+            text.setY(-10); // text above the bar
             text.setX((BAR_WIDTH - text.getLayoutBounds().getWidth()) / 2);
 
             Group group = new Group(bar, text);
-            group.setTranslateY(MAX_HEIGHT - value);
+            group.setTranslateY(0);// - value);
             bars.add(group);
             barContainer.getChildren().add(group);
 
@@ -118,7 +119,7 @@ public class SortingAlgorithms extends Application {
                 Text text = (Text) group.getChildren().get(1);
 
                 bar.setHeight(value);
-                group.setTranslateY(MAX_HEIGHT - value);
+                group.setTranslateY(0); // - value);
                 text.setText(String.valueOf(value));
                 text.setX((BAR_WIDTH - text.getLayoutBounds().getWidth()) / 2);
             }
