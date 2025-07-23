@@ -155,7 +155,7 @@ public class SortingAlgorithms extends Application {
     }
 
     private void pause() throws InterruptedException {
-        Thread.sleep(500);
+        Thread.sleep(50);
     }
 
     private void insertionSort() {
@@ -217,6 +217,8 @@ public class SortingAlgorithms extends Application {
             mergeSort(left, mid);
             mergeSort(mid + 1, right);
             merge(left, mid, right);
+            updateVisualization();
+            refreshBarContainer();
         }
     }
 
@@ -231,25 +233,34 @@ public class SortingAlgorithms extends Application {
             if (array.get(i) <= array.get(j)) {
                 temp.add(array.get(i));
                 tempBars.add(bars.get(i));
+                updateVisualization();
+                refreshBarContainer();
                 i++;
             } else {
                 temp.add(array.get(j));
                 tempBars.add(bars.get(j));
+                updateVisualization();
+                refreshBarContainer();
                 j++;
             }
             updateVisualization();
+            refreshBarContainer();
             pause();
         }
 
         while (i <= mid) {
             temp.add(array.get(i));
             tempBars.add(bars.get(i));
+            updateVisualization();
+            refreshBarContainer();
             i++;
         }
 
         while (j <= right) {
             temp.add(array.get(j));
             tempBars.add(bars.get(j));
+            updateVisualization();
+            refreshBarContainer();
             j++;
         }
 
