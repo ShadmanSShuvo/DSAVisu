@@ -18,7 +18,7 @@ import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
 public class SortingAlgorithms extends Application {
-    public static final int NUM_BARS = 20;
+    public static final int NUM_BARS = 32;
     private List<Integer> array = new ArrayList<>();
     private List<Group> bars = new ArrayList<>();
     private VBox root;
@@ -155,7 +155,7 @@ public class SortingAlgorithms extends Application {
     }
 
     private void pause() throws InterruptedException {
-        Thread.sleep(50);
+        Thread.sleep(500);
     }
 
     private void insertionSort() {
