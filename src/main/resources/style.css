@@ -19,6 +19,9 @@
 
 .button:hover {
     -fx-background-color: #2980b9;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-background-radius: 50;
 }
 
 .bar-container {
@@ -30,6 +33,7 @@
 
 .bar-label {
     -fx-font-size: 10px;
+    -fx-font-weight: bold;
     -fx-fill: #2f3640;
     -fx-text-alignment: center;
     -fx-alignment: center;

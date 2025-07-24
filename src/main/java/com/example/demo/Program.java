@@ -27,11 +27,12 @@ public class Program extends Application {
         Button quitBtn = new Button("Quit Program");
 
         // Style buttons
+        /* 
         for (Button btn : new Button[]{graphBtn, linkedListBtn, stackBtn, queueBtn, heapBtn, bstBtn, sortingBtn, quitBtn}) {
             btn.setStyle("-fx-font-size: 16px; -fx-padding: 10px 20px; -fx-background-color: #4CAF50; -fx-text-fill: white; -fx-background-radius: 5;");
             btn.setMaxWidth(300);
         }
-
+*/
         // Navigate to respective visualizations
         graphBtn.setOnAction(e -> new DataVisu("Graph").start(stage));
         linkedListBtn.setOnAction(e -> new DataVisu("Linked List").start(stage));

@@ -36,8 +36,12 @@
     -fx-cursor: hand;
 }
 
+
 .button:hover {
-    -fx-background-color: #1565c0;
+    -fx-background-color: #02fd62;
+    -fx-text-fill: black;
+    -fx-font-weight: bold;
+    -fx-background-radius: 50;
 }
 
 .button:disabled {
