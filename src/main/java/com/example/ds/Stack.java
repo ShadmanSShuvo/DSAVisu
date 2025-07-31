@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.ds;
 
 import javafx.animation.PauseTransition;
 import javafx.scene.control.Label;
@@ -82,7 +82,8 @@ public class Stack {
 
     private void showWarning(String msg) {
         Label warning = new Label(msg);
-        warning.setStyle("-fx-background-color: #ffeb3b; -fx-text-fill: #d32f2f; -fx-padding: 5; -fx-border-radius: 5;");
+        warning.setStyle(
+                "-fx-background-color: #ffeb3b; -fx-text-fill: #d32f2f; -fx-padding: 5; -fx-border-radius: 5;");
         warning.setLayoutX(10);
         warning.setLayoutY(10);
         canvas.getChildren().add(warning);

@@ -1,4 +1,4 @@
-package com.example.demo;
+package com.example.ds;
 
 import javafx.animation.PauseTransition;
 import javafx.scene.control.Label;
@@ -55,21 +55,19 @@ public class Queue {
         });
         pt.play();
     }
-//    public String front() {
-//        if (queue.isEmpty()) {
-//            throw new NoSuchElementException("Queue is empty");
-//        }
-//        return queue.get(0);
-//    }
+    // public String front() {
+    // if (queue.isEmpty()) {
+    // throw new NoSuchElementException("Queue is empty");
+    // }
+    // return queue.get(0);
+    // }
 
-//    public String front() {
-//        if (queue.isEmpty()) {
-//            showWarning("Queue is empty");
-//        }
-//        return queue.get(0);
-//    }
-
-
+    // public String front() {
+    // if (queue.isEmpty()) {
+    // showWarning("Queue is empty");
+    // }
+    // return queue.get(0);
+    // }
 
     public String front() {
         if (queue == null) {
@@ -108,7 +106,8 @@ public class Queue {
 
     private void showWarning(String msg) {
         Label warning = new Label(msg);
-        warning.setStyle("-fx-background-color: #ffeb3b; -fx-text-fill: #d32f2f; -fx-padding: 5; -fx-border-radius: 5;");
+        warning.setStyle(
+                "-fx-background-color: #ffeb3b; -fx-text-fill: #d32f2f; -fx-padding: 5; -fx-border-radius: 5;");
         warning.setLayoutX(10);
         warning.setLayoutY(10);
         canvas.getChildren().add(warning);

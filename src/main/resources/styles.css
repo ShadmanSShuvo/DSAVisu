@@ -48,6 +48,35 @@
     -fx-background-color: #cccccc;
     -fx-text-fill: #666666;
 }
+.menu-button {
+    -fx-background-color: linear-gradient(to bottom, #4a90e2, #357ABD);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-padding: 6 12 6 12;
+    -fx-background-radius: 8;
+    -fx-border-radius: 8;
+    -fx-border-color: #2a65a0;
+    -fx-border-width: 1px;
+    -fx-cursor: hand;
+}
+
+.menu-button:hover {
+    -fx-background-color: linear-gradient(to bottom, #5aa0f2, #4080c0);
+}
+
+.menu-button:focused {
+    -fx-effect: dropshadow(gaussian, #444444, 5, 0.5, 0, 0);
+}
+
+.menu-button > .arrow-button {
+    -fx-background-color: transparent;
+    -fx-padding: 0 6 0 6;
+}
+
+.menu-button > .arrow-button > .arrow {
+    -fx-shape: "M 0 0 L 4 4 L 8 0 Z";
+    -fx-background-color: white;
+}
 
 .combo-box {
     -fx-background-color: white;
